@@ -15,10 +15,10 @@ namespace jwtApi.Services
     {
         User Authenticate(string username, string password);
         IEnumerable<User> GetAll();
-        User GetByUserName(int id);
+        User GetById(int id);
         User GetByUserName(string userName);
         User Create(User user, string password);
-        void Update(User user, string password = null);
+        User Update(User user, string password = null);
         void Delete(int id);
     }
 
@@ -53,7 +53,7 @@ namespace jwtApi.Services
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _context.Users.SingleOrDefault(x => x.Username == username);
+            var user = GetByUserName(username);
 
             // check if username exists
             if (user == null)
@@ -93,7 +93,7 @@ namespace jwtApi.Services
             return _context.Users;
         }
 
-        public User GetByUserName(int id)
+        public User GetById(int id)
         {
             return _context.Users.First(x => x.Id == id);
         }
@@ -124,7 +124,7 @@ namespace jwtApi.Services
             return user;
         }
 
-        public void Update(User userParam, string password = null)
+        public User Update(User userParam, string password = null)
         {
             var user = _context.Users.First(x => x.Id == userParam.Id);
 
@@ -154,6 +154,8 @@ namespace jwtApi.Services
 
             _context.Users.Update(user);
             _context.SaveChanges();
+
+            return user;
         }
 
         public void Delete(int id)

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace jwtApi
 {
@@ -35,6 +36,7 @@ namespace jwtApi
                     options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAutoMapper();
 
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -57,7 +59,7 @@ namespace jwtApi
                     OnTokenValidated = context =>
                     {
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                        var userName = int.Parse(context.Principal.Identity.Name);
+                        var userName = context.Principal.Identity.Name;
                         var user = userService.GetByUserName(userName);
                         if (user == null)
                         {

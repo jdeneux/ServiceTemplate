@@ -14,8 +14,15 @@ namespace jwtApi.Helpers
         {
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();
-            CreateMap<User, UserRegisterDto>();
-            CreateMap<UserRegisterDto, User>();
+
+            CreateMap<User, UserAuthenticatedDto>();
+            CreateMap<UserAuthenticatedDto, User>();
+
+            CreateMap<User, UserAuthenticationDto>();
+            CreateMap<UserAuthenticationDto, User>();
+
+            CreateMap<User, UserNewRegisterDto>();
+            CreateMap<UserNewRegisterDto, User>();
         }
     }
 }
