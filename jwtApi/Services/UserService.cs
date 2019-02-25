@@ -15,7 +15,8 @@ namespace jwtApi.Services
     {
         User Authenticate(string username, string password);
         IEnumerable<User> GetAll();
-        User GetById(int id);
+        User GetByUserName(int id);
+        User GetByUserName(string userName);
         User Create(User user, string password);
         void Update(User user, string password = null);
         void Delete(int id);
@@ -24,13 +25,16 @@ namespace jwtApi.Services
     public class UserService : IUserService
     {
         // users hardcoded for simplicity, store in a db with hashed passwords in production applications
-        private List<User> _users = new List<User>();
+        // private List<User> _users = new List<User>();
 
+        private readonly DataContext _context;
         private readonly AppSettings _appSettings;
 
-        public UserService(IOptions<AppSettings> appSettings)
+        public UserService(DataContext context, IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
+
+            _context = context ?? throw new ArgumentNullException("context");
 
             // setup one user
             var user = new User
@@ -49,7 +53,7 @@ namespace jwtApi.Services
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _users.SingleOrDefault(x => x.Username == username);
+            var user = _context.Users.SingleOrDefault(x => x.Username == username);
 
             // check if username exists
             if (user == null)
@@ -86,12 +90,17 @@ namespace jwtApi.Services
         public IEnumerable<User> GetAll()
         {
             // return all users
-            return _users;
+            return _context.Users;
         }
 
-        public User GetById(int id)
+        public User GetByUserName(int id)
         {
-            return _users.First(x => x.Id == id);
+            return _context.Users.First(x => x.Id == id);
+        }
+
+        public User GetByUserName(string userName)
+        {
+            return _context.Users.First(x => x.Username == userName);
         }
 
         public User Create(User user, string password)
@@ -100,7 +109,7 @@ namespace jwtApi.Services
             if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password is required");
 
-            if (_users.Any(x => x.Username == user.Username))
+            if (_context.Users.Any(x => x.Username == user.Username))
                 throw new AppException($"Username \"{user.Username}\" is already taken");
 
             byte[] passwordHash, passwordSalt;
@@ -109,14 +118,15 @@ namespace jwtApi.Services
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            _users.Add(user);
+            _context.Users.Add(user);
+            _context.SaveChanges();
 
             return user;
         }
 
         public void Update(User userParam, string password = null)
         {
-            var user = _users.First(x => x.Id == userParam.Id);
+            var user = _context.Users.First(x => x.Id == userParam.Id);
 
             if (user == null)
                 throw new AppException("User not found");
@@ -124,7 +134,7 @@ namespace jwtApi.Services
             if (userParam.Username != user.Username)
             {
                 // username has changed so check if the new username is already taken
-                if (_users.Any(x => x.Username == userParam.Username))
+                if (_context.Users.Any(x => x.Username == userParam.Username))
                     throw new AppException($"Username {userParam.Username} is already taken");
             }
 
@@ -136,20 +146,23 @@ namespace jwtApi.Services
             // update password if it was entered
             if (!string.IsNullOrWhiteSpace(password))
             {
-                byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
             }
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
         }
 
         public void Delete(int id)
         {
-            var user = _users.First(x => x.Id == id);
+            var user = _context.Users.Find(id);
             if (user != null)
             {
-                _users.Remove(user);
+                _context.Users.Remove(user);
+                _context.SaveChanges();
             }
         }
 
@@ -163,7 +176,7 @@ namespace jwtApi.Services
             using (var hmac = new System.Security.Cryptography.HMACSHA512())
             {
                 passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
 
@@ -176,7 +189,7 @@ namespace jwtApi.Services
 
             using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
             {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 for (int i = 0; i < computedHash.Length; i++)
                 {
                     if (computedHash[i] != storedHash[i]) return false;

@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace jwtApi
 {
@@ -25,7 +27,7 @@ namespace jwtApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-
+            services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("UserDB"));
             services.AddMvc()
                 .AddJsonOptions(options =>
                 {
@@ -48,6 +50,22 @@ namespace jwtApi
             })
             .AddJwtBearer(x =>
             {
+                // Check if the user is still valid
+                // return unauthorized if user no longer exists
+                x.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                        var userName = int.Parse(context.Principal.Identity.Name);
+                        var user = userService.GetByUserName(userName);
+                        if (user == null)
+                        {
+                            context.Fail("Unauthorized");
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters

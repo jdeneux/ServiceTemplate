@@ -1,0 +1,98 @@
+{
+	"info": {
+		"_postman_id": "84d70e78-aa5a-43b8-b8f7-43cdc2391cc1",
+		"name": "Authentication JWT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authenticate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e69adcd6-be8e-491d-ba12-ccf1cc13b4c0",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", data.token);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"disabled": false
+					},
+					{
+						"key": "MicrosoftAppId",
+						"value": "89156b06-c35c-485f-b3bd-8f20d30d95ec",
+						"disabled": false
+					},
+					{
+						"key": "MicrosoftAppPassword",
+						"value": "td_!5U_|2O?GM3XC",
+						"disabled": false
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\tusername:\"jdeneux\",\n\tpassword:\"test\"\n}"
+				},
+				"url": {
+					"raw": "https://localhost:5001/api/users/authenticate",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"users",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "https://localhost:5001/api/users",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
