@@ -86,6 +86,7 @@ namespace jwtApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,User,Limited")]
         public IActionResult GetById(int id)
         {
             try
@@ -102,6 +103,7 @@ namespace jwtApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,User")]
         public IActionResult Update(int id, [FromBody]UserNewRegisterDto userDto)
         {
             // map dto to entity and set id
@@ -123,6 +125,7 @@ namespace jwtApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,User")]
         public IActionResult Delete(int id)
         {
             _userService.Delete(id);

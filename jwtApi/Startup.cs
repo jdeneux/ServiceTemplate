@@ -34,6 +34,7 @@ namespace jwtApi
                 {
                     options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
                     options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                    options.SerializerSettings.MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Error;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAutoMapper();

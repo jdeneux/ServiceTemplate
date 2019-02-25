@@ -33,19 +33,7 @@ namespace jwtApi.Services
         public UserService(DataContext context, IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
-
             _context = context ?? throw new ArgumentNullException("context");
-
-            // setup one user
-            var user = new User
-            {
-                Id = 1,
-                FirstName = "Julien",
-                LastName = "Deneux",
-                Username = "jdeneux",
-                Role = Role.Limited
-            };
-            Create(user, "test");
         }
 
         public User Authenticate(string username, string password)
@@ -95,12 +83,25 @@ namespace jwtApi.Services
 
         public User GetById(int id)
         {
-            return _context.Users.First(x => x.Id == id);
+            if (_context.Users.Count() > 0)
+            {
+                return _context.Users.First(x => x.Id == id);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public User GetByUserName(string userName)
         {
-            return _context.Users.First(x => x.Username == userName);
+            if (_context.Users.Count() > 0)
+            {
+                return _context.Users.First(x => x.Username == userName);
+            } else
+            {
+                return null;
+            }
         }
 
         public User Create(User user, string password)
@@ -126,36 +127,43 @@ namespace jwtApi.Services
 
         public User Update(User userParam, string password = null)
         {
-            var user = _context.Users.First(x => x.Id == userParam.Id);
-
-            if (user == null)
-                throw new AppException("User not found");
-
-            if (userParam.Username != user.Username)
+            if(_context.Users.Count() > 0)
             {
-                // username has changed so check if the new username is already taken
-                if (_context.Users.Any(x => x.Username == userParam.Username))
-                    throw new AppException($"Username {userParam.Username} is already taken");
-            }
+                var user = _context.Users.First(x => x.Id == userParam.Id);
 
-            // update user properties
-            user.FirstName = userParam.FirstName;
-            user.LastName = userParam.LastName;
-            user.Username = userParam.Username;
+                if (user == null)
+                    throw new AppException("User not found");
 
-            // update password if it was entered
-            if (!string.IsNullOrWhiteSpace(password))
+                if (userParam.Username != user.Username)
+                {
+                    // username has changed so check if the new username is already taken
+                    if (_context.Users.Any(x => x.Username == userParam.Username))
+                        throw new AppException($"Username {userParam.Username} is already taken");
+                }
+
+                // update user properties
+                user.FirstName = userParam.FirstName;
+                user.LastName = userParam.LastName;
+                user.Username = userParam.Username;
+
+                // update password if it was entered
+                if (!string.IsNullOrWhiteSpace(password))
+                {
+                    CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+
+                    user.PasswordHash = passwordHash;
+                    user.PasswordSalt = passwordSalt;
+                }
+
+                _context.Users.Update(user);
+                _context.SaveChanges();
+
+                return user;
+            } else
             {
-                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-
-                user.PasswordHash = passwordHash;
-                user.PasswordSalt = passwordSalt;
+                return null;
             }
-
-            _context.Users.Update(user);
-            _context.SaveChanges();
-
-            return user;
+            
         }
 
         public void Delete(int id)
