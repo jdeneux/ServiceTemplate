@@ -6,6 +6,7 @@ using jwtApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Collections.Generic;
 
 namespace jwtApi.Controllers
@@ -15,14 +16,14 @@ namespace jwtApi.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ILogger<UsersController> _logger;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserService userService, IMapper mapper, ILoggerFactory loggerFactory)
+        public UsersController(IUserService userService, IMapper mapper)
         {
             _mapper = mapper;
             _userService = userService;
-            _logger = loggerFactory.CreateLogger<UsersController>();
+
+            Log.Debug("Create Users Controller");
         }
 
         [AllowAnonymous]

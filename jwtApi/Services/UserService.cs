@@ -85,7 +85,7 @@ namespace jwtApi.Services
         {
             if (_context.Users.Count() > 0)
             {
-                return _context.Users.First(x => x.Id == id);
+                return _context.Users.FirstOrDefault(x => x.Id == id);
             }
             else
             {
@@ -97,7 +97,7 @@ namespace jwtApi.Services
         {
             if (_context.Users.Count() > 0)
             {
-                return _context.Users.First(x => x.Username == userName);
+                return _context.Users.FirstOrDefault(x => x.Username == userName);
             } else
             {
                 return null;
@@ -129,7 +129,7 @@ namespace jwtApi.Services
         {
             if(_context.Users.Count() > 0)
             {
-                var user = _context.Users.First(x => x.Id == userParam.Id);
+                var user = _context.Users.FirstOrDefault(x => x.Id == userParam.Id);
 
                 if (user == null)
                     throw new AppException("User not found");

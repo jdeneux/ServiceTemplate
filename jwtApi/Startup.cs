@@ -80,6 +80,9 @@ namespace jwtApi
                 };
             });
 
+            // Add HealthCheck support
+            services.AddHealthChecks();
+
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
         }
@@ -91,14 +94,6 @@ namespace jwtApi
             {
                 app.UseDeveloperExceptionPage();
             }
-            //else
-            //{
-            //    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            //    app.UseHsts();
-            //}
-
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
 
             // global cors policy
             app.UseCors(x => x
@@ -111,6 +106,10 @@ namespace jwtApi
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            // Configure the healthcheck endpoint
+            app.UseHealthChecks("/health");
+
         }
     }
 }
