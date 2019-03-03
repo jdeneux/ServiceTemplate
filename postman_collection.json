@@ -1,12 +1,380 @@
 {
 	"info": {
 		"_postman_id": "84d70e78-aa5a-43b8-b8f7-43cdc2391cc1",
-		"name": "Authentication JWT",
+		"name": "TemplateAPI",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Authenticate",
+			"name": "Register new user",
+			"item": [
+				{
+					"name": "[Register new user] [succeed] Regular registration Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "58a8ce72-0ef7-4e6a-9d11-01857ffca2b7",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"userId\", data.id);",
+									"",
+									"//Check status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"//Validate Json answer",
+									"pm.test('Answer is valid JSON', function() {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Entity User validation",
+									"pm.test('Entity User is valid', function() {",
+									"    var userSchema = postman.getEnvironmentVariable(\"userSchema\");",
+									"    pm.expect(tv4.validate(data, userSchema)).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\tfirstName: 'Julien',\n\tlastName: 'Deneux',\n\tuserName: 'jdeneux_admin',\n\tRole: 'Admin',\n\tpassword: 'test'\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Register new user] [succeed] Regular registration Limited",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "58a8ce72-0ef7-4e6a-9d11-01857ffca2b7",
+								"type": "text/javascript",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"userId\", data.id);",
+									"",
+									"//Check status code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"//Validate Json answer",
+									"pm.test('Answer is valid JSON', function() {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Entity User validation",
+									"pm.test('Entity User is valid', function() {",
+									"    var userSchema = postman.getEnvironmentVariable(\"userSchema\");",
+									"    pm.expect(tv4.validate(data, userSchema)).to.be.true;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\tfirstName: 'Julien',\n\tlastName: 'Deneux',\n\tuserName: 'jdeneux',\n\tRole: 'Limited',\n\tpassword: 'test'\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Register new user] [fail] username field missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "03863202-ae10-48f7-a218-196a359a3bee",
+								"type": "text/javascript",
+								"exec": [
+									"// Retrieve the body data",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Username is missing\", function () {",
+									"    pm.expect(data.errors.Username).to.eql([\"The Username field is required.\"]);",
+									"});",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\tfirstName: 'Julien',\n\tlastName: 'Deneux',\n\tRole: 'Limited',\n\tpassword: 'test'\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Register new user] [fail] firstName field missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "25d6398a-a51f-46ba-b6e9-121277e2d7c6",
+								"type": "text/javascript",
+								"exec": [
+									"// Retrieve the body data",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Firstname is missing\", function () {",
+									"    pm.expect(data.errors.FirstName).to.eql([\"The FirstName field is required.\"]);",
+									"});",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\tlastName: 'Deneux',\n\tusername: 'jdeneux_fail',\n\trole: 'Limited',\n\tpassword: 'test'\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Register new user] [fail] lastName field missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "19e048a5-ccaf-4244-9a45-d07f8b754835",
+								"type": "text/javascript",
+								"exec": [
+									"// Retrieve the body data",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"LastName is missing\", function () {",
+									"    pm.expect(data.errors.LastName).to.eql([\"The LastName field is required.\"]);",
+									"});",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\tfirstName: 'Julien',\n\tusername: 'jdeneux_fail',\n\trole: 'Limited',\n\tpassword: 'test'\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Register new user] [fail] password field missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dade6e0d-2554-47ed-92f4-a135bfb79078",
+								"type": "text/javascript",
+								"exec": [
+									"// Retrieve the body data",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Password is missing\", function () {",
+									"    pm.expect(data.errors.Password).to.eql([\"The Password field is required.\"]);",
+									"});",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\tfirstName: 'Julien',\n\tlastName: 'Deneux',\n\tusername: 'jdeneux_fail',\n\trole: 'User'\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HealthChecks",
+			"item": [
+				{
+					"name": "Get HealthCheck Status",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:5000/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authenticate - Limited User",
 			"event": [
 				{
 					"listen": "test",
@@ -15,6 +383,7 @@
 						"exec": [
 							"var data = JSON.parse(responseBody);",
 							"postman.setEnvironmentVariable(\"token\", data.token);",
+							"postman.setEnvironmentVariable(\"userId\", data.id);",
 							""
 						],
 						"type": "text/javascript"
@@ -27,16 +396,6 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
-						"disabled": false
-					},
-					{
-						"key": "MicrosoftAppId",
-						"value": "89156b06-c35c-485f-b3bd-8f20d30d95ec",
-						"disabled": false
-					},
-					{
-						"key": "MicrosoftAppPassword",
-						"value": "td_!5U_|2O?GM3XC",
 						"disabled": false
 					}
 				],
@@ -61,26 +420,37 @@
 			"response": []
 		},
 		{
-			"name": "Get Users",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
+			"name": "Authenticate - Admin User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e69adcd6-be8e-491d-ba12-ccf1cc13b4c0",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", data.token);",
+							"postman.setEnvironmentVariable(\"userId\", data.id);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
+				"method": "POST",
+				"header": [
+					{
+						"disabled": false,
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\tusername:\"jdeneux_admin\",\n\tpassword:\"test\"\n}"
 				},
-				"method": "GET",
-				"header": [],
-				"body": {},
 				"url": {
-					"raw": "https://localhost:5001/api/users",
+					"raw": "https://localhost:5001/api/users/authenticate",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -88,7 +458,128 @@
 					"port": "5001",
 					"path": [
 						"api",
+						"users",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5000/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
 						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User by Id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/users/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"users",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"JulienUpd\",\n    \"lastName\": \"DeneuxUpd\",\n    \"username\": \"jdeneux_admin\",\n    \"role\": \"Admin\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/users/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"users",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5000/api/users/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"users",
+						"{{userId}}"
 					]
 				}
 			},
