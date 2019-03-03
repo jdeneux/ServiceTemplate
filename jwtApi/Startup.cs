@@ -1,17 +1,15 @@
 ﻿using jwtApi.Helpers;
 using jwtApi.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
+using jwtApi.Config;
+using Microsoft.AspNetCore.Http;
 
 namespace jwtApi
 {
@@ -28,15 +26,11 @@ namespace jwtApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
+
             services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("UserDB"));
-            services.AddMvc()
-                .AddJsonOptions(options =>
-                {
-                    options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-                    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-                    options.SerializerSettings.MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Error;
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddAppMvc();
+
             services.AddAutoMapper();
 
             // configure strongly typed settings objects
@@ -46,42 +40,13 @@ namespace jwtApi
             // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(x =>
-            {
-                // Check if the user is still valid
-                // return unauthorized if user no longer exists
-                x.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = context =>
-                    {
-                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                        var userName = context.Principal.Identity.Name;
-                        var user = userService.GetByUserName(userName);
-                        if (user == null)
-                        {
-                            context.Fail("Unauthorized");
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
+            services.AddAppAuthentication(key);
 
             // Add HealthCheck support
-            services.AddHealthChecks();
+            services.AddAppHealthCheck();
+
+            // Add Swagger
+            services.AddAppSwagger();
 
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
@@ -90,10 +55,7 @@ namespace jwtApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseHttpsRedirection();
 
             // global cors policy
             app.UseCors(x => x
@@ -102,14 +64,22 @@ namespace jwtApi
                 .AllowAnyHeader()
                 .AllowCredentials());
 
-            app.UseAuthentication();
-
-            app.UseHttpsRedirection();
-            app.UseMvc();
-
-            // Configure the healthcheck endpoint
-            app.UseHealthChecks("/health");
-
+            app.When(env.IsDevelopment(), app.UseDeveloperExceptionPage)
+                .When(env.IsDevelopment(), app.UseAppSwagger)
+                .When(!env.IsDevelopment(), app.UseHsts)
+                .UseAppHealthCheck()
+                .UseAppAuthentication()
+                .UseMiddleware<DomainErrorHandlerMiddleware>()
+                .UseAppMvc()
+                .Run(NotFoundHandler);
         }
+
+        private readonly RequestDelegate NotFoundHandler =
+            async ctx =>
+            {
+                ctx.Response.StatusCode = 404;
+                await ctx.Response.WriteAsync("Page not found.");
+            };
+
     }
 }

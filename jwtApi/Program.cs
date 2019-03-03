@@ -3,41 +3,45 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using System;
 using System.IO;
 
 namespace jwtApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            var webHost = CreateWebHostBuilder(args);
+            try
+            {
+                var webHost = CreateWebHostBuilder(args);
+                webHost.Run();
 
-            //var configuration = new ConfigurationBuilder()
-            //    .SetBasePath(Directory.GetCurrentDirectory())
-            //            .AddJsonFile("appsettings.json")
-            //            .AddJsonFile($"appsettings.{_environmentName}.json", optional: true, reloadOnChange: true)
-            //            .Build();
+                return 0;
 
-            //Log.Logger = new LoggerConfiguration()
-            //    .ReadFrom.Configuration(configuration)
-            //    .CreateLogger();
-
-            webHost.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host Terminated unexpectedly");
+                return -1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IWebHost CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .ConfigureLogging((hostingContext, logging) =>
-                {
-                    logging.ClearProviders();
-                })
                 .UseStartup<Startup>()
                 .UseSerilog((hostingContext, logging) =>
                 {
                     logging.ReadFrom.Configuration(hostingContext.Configuration)
-                        .Enrich.FromLogContext();
+                        .Enrich.FromLogContext()
+                        .Enrich.WithProperty("Application", "JwtApi")
+                        .Enrich.WithProperty("ApplicationVersion", "v1");
                 })
+                .UseKestrel(k => k.AddServerHeader = false)
                 .Build();
     }
 }
