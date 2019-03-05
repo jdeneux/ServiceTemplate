@@ -42,6 +42,7 @@ namespace jwtApi
                         .Enrich.WithProperty("ApplicationVersion", "v1");
                 })
                 .UseKestrel(k => k.AddServerHeader = false)
+                .UseUrls("http://0.0.0.0:5000", "https://0.0.0.0:5001")
                 .Build();
     }
 }

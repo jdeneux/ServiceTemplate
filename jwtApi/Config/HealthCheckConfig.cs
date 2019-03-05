@@ -5,7 +5,7 @@ namespace jwtApi.Config
 {
     public static class HealthCheckConfig
     {
-        private static string EndPoint = "/health";
+        public static string EndPoint = "/health";
 
         public static IServiceCollection AddAppHealthCheck(this IServiceCollection services)
         {

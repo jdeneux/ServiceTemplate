@@ -10,6 +10,7 @@ using System.Text;
 using AutoMapper;
 using jwtApi.Config;
 using Microsoft.AspNetCore.Http;
+using CondenserDotNet.Client;
 
 namespace jwtApi
 {
@@ -48,12 +49,15 @@ namespace jwtApi
             // Add Swagger
             services.AddAppSwagger();
 
+            // Add Condenser
+            services.AddAppConsulServices();
+
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IServiceManager serviceManager)
         {
             app.UseHttpsRedirection();
 
@@ -64,6 +68,9 @@ namespace jwtApi
                 .AllowAnyHeader()
                 .AllowCredentials());
 
+            // Register Consul Service
+            serviceManager.UseAppConsulServices();
+
             app.When(env.IsDevelopment(), app.UseDeveloperExceptionPage)
                 .When(env.IsDevelopment(), app.UseAppSwagger)
                 .When(!env.IsDevelopment(), app.UseHsts)
@@ -71,7 +78,7 @@ namespace jwtApi
                 .UseAppAuthentication()
                 .UseMiddleware<DomainErrorHandlerMiddleware>()
                 .UseAppMvc()
-                .Run(NotFoundHandler);
+                .Run(NotFoundHandler); // Default handler for all requests not processed by a Middleware
         }
 
         private readonly RequestDelegate NotFoundHandler =
