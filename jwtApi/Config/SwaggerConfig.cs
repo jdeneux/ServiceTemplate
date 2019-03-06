@@ -12,7 +12,7 @@ namespace jwtApi.Config
     public static class SwaggerConfig
     {
         private static string Endpoint => $"/swagger/{AppConfig.Version}/swagger.json";
-        private static string UIEndpoint => $"";
+        private static string UiEndpoint => $"";
 
         public static IServiceCollection AddAppSwagger(this IServiceCollection services)
         {
@@ -29,7 +29,7 @@ namespace jwtApi.Config
 
         private static void _swaggerUIConfig(SwaggerUIOptions config)
         {
-            config.RoutePrefix = UIEndpoint;
+            config.RoutePrefix = UiEndpoint;
             config.SwaggerEndpoint(Endpoint, AppConfig.Name);
         }
 

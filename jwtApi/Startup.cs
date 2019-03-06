@@ -78,10 +78,10 @@ namespace jwtApi
                 .UseAppAuthentication()
                 .UseMiddleware<DomainErrorHandlerMiddleware>()
                 .UseAppMvc()
-                .Run(NotFoundHandler); // Default handler for all requests not processed by a Middleware
+                .Run(_notFoundHandler); // Default handler for all requests not processed by a Middleware
         }
 
-        private readonly RequestDelegate NotFoundHandler =
+        private readonly RequestDelegate _notFoundHandler =
             async ctx =>
             {
                 ctx.Response.StatusCode = 404;

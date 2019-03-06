@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using jwtApi.Dto;
 using jwtApi.Entities;
-using jwtApi.Helpers;
 using jwtApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using System.Collections.Generic;
 

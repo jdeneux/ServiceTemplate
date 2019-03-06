@@ -1,7 +1,5 @@
 ﻿using CondenserDotNet.Client;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Net;
 
 namespace jwtApi.Config
