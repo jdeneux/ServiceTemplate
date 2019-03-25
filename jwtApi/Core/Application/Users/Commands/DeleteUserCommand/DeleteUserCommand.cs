@@ -15,12 +15,10 @@ namespace jwtApi.Core.Application.Users.Commands.DeleteUserCommand
         public class Handler : IRequestHandler<DeleteUserCommand>
         {
             private readonly DataContext _context;
-            private readonly IMapper _mapper;
 
-            public Handler(DataContext context, IMapper mapper)
+            public Handler(DataContext context)
             {
                 _context = context;
-                _mapper = mapper;
             }
 
             public async Task<Unit> Handle(DeleteUserCommand request, CancellationToken cancellationToken)

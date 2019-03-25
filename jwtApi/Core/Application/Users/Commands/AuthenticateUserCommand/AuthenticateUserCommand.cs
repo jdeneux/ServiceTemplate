@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using jwtApi.Core.Application.Security;
-using jwtApi.Core.Application.Users.Queries.GetUserByNameQuery;
 using jwtApi.Core.Domain.Entities;
 using jwtApi.Core.Domain.Exceptions;
 using jwtApi.Infrastructure.Persistence;
