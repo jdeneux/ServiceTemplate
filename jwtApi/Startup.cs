@@ -1,5 +1,4 @@
 ﻿using jwtApi.Helpers;
-using jwtApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +7,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using AutoMapper;
-using jwtApi.Config;
 using Microsoft.AspNetCore.Http;
 using CondenserDotNet.Client;
+using jwtApi.Infrastructure.Persistence;
+using jwtApi.Presentation.Config;
+using jwtApi.Core.Application;
+using jwtApi.Presentation.Middlewares;
+using MediatR;
+using System.Reflection;
+using jwtApi.Core.Application.Infrastructure.AutoMapper;
+using MediatR.Pipeline;
+using jwtApi.Core.Application.Infrastructure;
 
 namespace jwtApi
 {
@@ -32,7 +39,12 @@ namespace jwtApi
 
             services.AddAppMvc();
 
-            services.AddAutoMapper();
+            services.AddAutoMapper(new Assembly[] { typeof(AutoMapperProfile).GetTypeInfo().Assembly });
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddMediatR();
 
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -51,9 +63,6 @@ namespace jwtApi
 
             // Add Condenser
             services.AddAppConsulServices();
-
-            // configure DI for application services
-            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,8 +84,8 @@ namespace jwtApi
                 .When(env.IsDevelopment(), app.UseAppSwagger)
                 .When(!env.IsDevelopment(), app.UseHsts)
                 .UseAppHealthCheck()
-                .UseAppAuthentication()
                 .UseMiddleware<DomainErrorHandlerMiddleware>()
+                .UseAppAuthentication()
                 .UseAppMvc()
                 .Run(_notFoundHandler); // Default handler for all requests not processed by a Middleware
         }
