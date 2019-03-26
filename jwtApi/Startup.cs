@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +18,7 @@ using jwtApi.Core.Application.Infrastructure.AutoMapper;
 using MediatR.Pipeline;
 using jwtApi.Core.Application.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc;
 
 namespace jwtApi
 {
@@ -27,6 +27,8 @@ namespace jwtApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            typeof(Startup).Assembly.GetName().Version = new System.Version(AppConfig.GetLongVersion());
         }
 
         public IConfiguration Configuration { get; }
@@ -66,7 +68,13 @@ namespace jwtApi
             services.AddAppConsulServices();
 
             // Add Api Version Header management
-            services.AddApiVersioning(o => o.ApiVersionReader = new HeaderApiVersionReader("api-version"));
+            services.AddApiVersioning(o =>
+            {
+                o.ApiVersionReader = new HeaderApiVersionReader("api-version");
+                o.DefaultApiVersion = new ApiVersion(AppConfig.GetMajorVersion(),AppConfig.GetMinorVersion());
+                o.ReportApiVersions = true;
+                o.AssumeDefaultVersionWhenUnspecified = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

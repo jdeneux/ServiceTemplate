@@ -7,7 +7,11 @@
     <UserSecretsId>4487a5dd-cd20-423c-8148-fa4056c03525</UserSecretsId>
     <StartupObject>jwtApi.Program</StartupObject>
     <LangVersion>8.0</LangVersion>
-    <Version>1.1.0</Version>
+    <Version>1.0.1</Version>
+    <PackageId>JwtApi</PackageId>
+    <Authors>Julien Deneux</Authors>
+    <Company />
+    <Product>Template API</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

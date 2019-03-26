@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using jwtApi.Core.Domain.Exceptions;
-using jwtApi.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace jwtApi.Presentation.Controllers.Home.V1

@@ -11,7 +11,7 @@ namespace jwtApi.Presentation.Config
 {
     public static class SwaggerConfig
     {
-        private static string Endpoint => $"/swagger/{AppConfig.Version}/swagger.json";
+        private static string Endpoint => $"/swagger/{AppConfig.GetShortVersion()}/swagger.json";
         private static string UiEndpoint => $"";
 
         public static IServiceCollection AddAppSwagger(this IServiceCollection services)
@@ -36,8 +36,8 @@ namespace jwtApi.Presentation.Config
         private static void _swaggerGenConfig(SwaggerGenOptions config)
         {
             config.SwaggerDoc(
-                AppConfig.Version,
-                new Info { Version = AppConfig.Version, Title = AppConfig.Name });
+                AppConfig.GetShortVersion(),
+                new Info { Version = AppConfig.GetShortVersion(), Title = AppConfig.Name });
 
             config.DescribeAllEnumsAsStrings();
 
