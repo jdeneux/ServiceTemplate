@@ -18,6 +18,7 @@ using System.Reflection;
 using jwtApi.Core.Application.Infrastructure.AutoMapper;
 using MediatR.Pipeline;
 using jwtApi.Core.Application.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace jwtApi
 {
@@ -63,6 +64,9 @@ namespace jwtApi
 
             // Add Condenser
             services.AddAppConsulServices();
+
+            // Add Api Version Header management
+            services.AddApiVersioning(o => o.ApiVersionReader = new HeaderApiVersionReader("api-version"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

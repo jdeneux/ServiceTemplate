@@ -10,8 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System.Threading.Tasks;
 
-namespace jwtApi.Presentation.Controllers
+namespace jwtApi.Presentation.Controllers.Users.V1
 {
+    [ApiVersion("1.0")]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : BaseController
@@ -61,9 +62,6 @@ namespace jwtApi.Presentation.Controllers
         [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult> Delete(int id)
         {
-            //_userService.Delete(id);
-            //return Ok();
-
             await Mediator.Send(new DeleteUserCommand { Id = id });
             return Ok();
         }

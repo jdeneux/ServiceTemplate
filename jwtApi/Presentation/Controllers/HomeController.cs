@@ -6,8 +6,9 @@ using jwtApi.Core.Domain.Exceptions;
 using jwtApi.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
-namespace jwtApi.Presentation.Controllers
+namespace jwtApi.Presentation.Controllers.Home.V1
 {
+    [ApiVersion("1.0")]
     [ApiController]
     public class HomeController : ControllerBase
     {
